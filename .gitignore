@@ -46,3 +46,4 @@ vignettes/*.pdf
 
 # bk
 bk
+.DS_Store
