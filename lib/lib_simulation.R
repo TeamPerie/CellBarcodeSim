@@ -147,37 +147,15 @@ do_pcr = function(temp, cycle = 30, efficiency = 0.705, error = 1e-6, reads = 5e
 
 #' MiSeq sequencing model
 
-#' The customed profile
-#'  MiSeq110_fq_Wenjie_batch2: ./ngs_simu/profile_MiSeq110_Wenjie_batch2.txt
-if (!file.exists("./tmp/profile_MiSeq110_Wenjie_batch2.txt")) {
-    cmd_prepare_profile = "./lib/ngs_simu/art_bin_MountRainier/ART_profiler_illumina/art_profiler_illumina ./tmp/profile_MiSeq110_Wenjie_batch2 ./data/MiSeq_sequencing_data/MiSeq110_fq_Wenjie_batch2/ gz"
-    # system(cmd_prepare_profile)
-}
-
 #' parameters
 #'  input: fasta file
 #'  profile: it can be MSv1, HS20 ...
 #'  reads_length: default is 110
 #'  output: the output of the simulated sequencing reads
-simu_sequence_run_command = function(input, profile, reads_length = 110, output) {
-    cmd = str_glue("./lib/ngs_simu/art_bin_MountRainier/art_illumina -ss {profile} -i {input} -amp -o {output} -l {reads_length} -f 1")
+simu_sequence_run_command = function(input, profile, reads_length = 110, output, art_bin = "./lib/art_bin_MountRainier/art_illumina") {
+    cmd = str_glue("{art_bin} -ss {profile} -i {input} -amp -o {output} -l {reads_length} -f 1")
     system(cmd)
 }
-
-# cmd1 = str_glue("./ngs_simu/art_bin_MountRainier/art_illumina -1 ngs_simu/profile_MiSeq110_Wenjie_batch2.txt -i ./pcr_products1.fa -amp -o ./seq_pcr1 -l 110 -f 1")
-# cmd2 = str_glue("./ngs_simu/art_bin_MountRainier/art_illumina -1 ngs_simu/profile_MiSeq110_Wenjie_batch2.txt -i ./pcr_products2.fa -amp -o ./seq_pcr2 -l 110 -f 1")
-
-# cmd1 = str_glue("./ngs_simu/art_bin_MountRainier/art_illumina -1 ngs_simu/profile_MiSeq110_Candice_batch1.txt -i ./pcr_products1.fa -amp -o ./seq_pcr1 -l 110 -f 1")
-# cmd2 = str_glue("./ngs_simu/art_bin_MountRainier/art_illumina -1 ngs_simu/profile_MiSeq110_Candice_batch1.txt -i ./pcr_products2.fa -amp -o ./seq_pcr2 -l 110 -f 1")
-
- 
-# cmd1 = str_glue("./ngs_simu/art_bin_MountRainier/art_illumina -ss MSv1 -i ./pcr_products1.fa -amp -o ./seq_pcr1 -l 110 -f 1")
-# cmd2 = str_glue("./ngs_simu/art_bin_MountRainier/art_illumina -ss MSv1 -i ./pcr_products2.fa -amp -o ./seq_pcr2 -l 110 -f 1")
-# cmd1 = str_glue("./ngs_simu/art_bin_MountRainier/art_illumina -ss HS20 -i ./pcr_products1.fa -amp -o ./seq_pcr1 -l 100 -f 1")
-# cmd2 = str_glue("./ngs_simu/art_bin_MountRainier/art_illumina -ss HS20 -i ./pcr_products2.fa -amp -o ./seq_pcr2 -l 100 -f 1")
-
-# system(cmd1)
-# system(cmd2)
 
 ##################################
 #  Main function for simulation  #
@@ -219,7 +197,8 @@ simulate_main = function(
     is_replicate         = F,
     top_seq              = "",
     bottom_seq           = "",
-    sequence_trunk       = 10
+    sequence_trunk       = 10,
+    art_bin              = "./lib/art_bin_MountRainier/art_illumina"
     ) {
 
     dir.create("./tmp/", showWarnings=F)
@@ -276,7 +255,8 @@ simulate_main = function(
         input = library_fasta,
         profile = ngs_profile,
         reads_length = reads_length,
-        output = output_prefix
+        output = output_prefix,
+        art_bin = art_bin
         )
 
     if (is_replicate) {
@@ -297,7 +277,8 @@ simulate_main = function(
             input = library_fasta2,
             profile = ngs_profile,
             reads_length = reads_length,
-            output = output_prefix2
+            output = output_prefix2,
+            art_bin = art_bin
         )
 
         library_fasta = c(library_fasta, library_fasta2)
@@ -353,7 +334,8 @@ simulate_main_umi = function(
     sequence_trunk       = 10,
     preamp_n             = 0,
     umi_length           = 8,
-    umi_tagging_efficiency = 0.25
+    umi_tagging_efficiency = 0.25,
+    art_bin              = "./lib/art_bin_MountRainier/art_illumina"
     ) {
 
     dir.create("./tmp/", showWarnings=F)
@@ -446,7 +428,8 @@ simulate_main_umi = function(
         input = library_fasta,
         profile = ngs_profile,
         reads_length = reads_length,
-        output = output_prefix
+        output = output_prefix,
+        art_bin = art_bin
         )
 
     

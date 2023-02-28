@@ -12,7 +12,7 @@ Download the ART NGS simulator from here:
 
 https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm 
 
-And install it to the `lib` fold.
+And put it to the `lib` fold. The default simulator executable file should be `./lib/art_bin_MountRainier/art_illumina`. Otherwise, the `art_bin` variable should be configured to point the `art_illumina` file.
 
 ### Install R dependencies
 
@@ -45,11 +45,12 @@ simulate_main(
     pcr_read_per_cell    = 50,
     output_prefix        = "./tmp/simu_seq",
     ngs_profile          = "MSv1",
-    reads_length         = 100,
+    reads_length         = 10,
     is_replicate         = F,
     top_seq              = "",
     bottom_seq           = "",
-    sequence_trunk       = 10
+    sequence_trunk       = 10,
+    art_bin              = "./lib/art_bin_MountRainier/art_illumina"
 )
 ```
 
@@ -66,11 +67,12 @@ The parameters:
 -   `pcr_read_per_cell`: Reads number needed for sequence, how much per progeny cell.
 -   `output_prefix`: Output prefix.
 -   `ngs_profile`: NGS profile, this option will be transmit to ART sequencing simulator. The building profile is, "MSv1", "HS20" etc. For more detail, please check the ART simulator.
--   `reads_length`: The NGS sequencing reads length.
+-   `reads_length`: The NGS sequencing reads length. It should be shorter than the PCR results. Otherwise there will be an error. In that case, you can add `top_seq` or `bottom_seq` to increase the PCR results.
 -   `is_replicate`: Generate technical replicates or not. The technical replicates will generate by dividing the progeny cells into two sample and do the PCR for each of them. The two sequencing output will be labeled by pendix `_2` of the output file.
 -   `top_seq`: Add 5 end constant sequences to the barcodes for sequencing simulation.
 -   `bottom_seq`: Add 3 end constant sequences to the barcodes sequencing simulation.
 -   `sequence_trunk`: To make the barocde sequence short by choosing the first n base, default 10.
+-   `art_bin`: the executable ART simulator location. The default is "./lib/art_bin_MountRainier/art_illumina".
 
 ## UMI sequencing simulation
 
@@ -97,7 +99,8 @@ simulate_main_umi(
     sequence_trunk       = 10,
     preamp_n             = 0,
     umi_length           = 8,
-    umi_tagging_efficiency = 0.25
+    umi_tagging_efficiency = 0.25,
+    art_bin              = "./lib/art_bin_MountRainier/art_illumina"
 )
 ```
 
