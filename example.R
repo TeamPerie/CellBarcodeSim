@@ -24,4 +24,5 @@ simulate_main(
     top_seq              = "AAAAAAAAAAGGGGG",
     bottom_seq           = "TTTTTTTTTT",
     sequence_trunk       = 10
+    art_bin              = "./lib/art_bin_MountRainier/art_illumina"
 )
