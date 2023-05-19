@@ -42,69 +42,40 @@ simu_clone_size_uniform = function(
 #  Barcode simulation  #
 ########################
 
-simu_barcode_hamming = function(file = "./tmp/hamming_barcodes.tsv") {
-    if (!file.exists(file)) {
-        b_v = DNABarcodes::create.dnabarcodes(n = 14)
-        ## save as two column: seq, freq
-        x = table(b_v)
-        d = data.frame(seq = names(x), freq = as.integer(x))
-        readr::write_tsv(d, file)
-    }
-    fread(file)
+simu_barcode_hamming = function(
+    length = 10,
+    dist = 3,
+    output = "hamming_barcodes.tsv"
+    ) {
+    b_v = DNABarcodes::create.dnabarcodes(n = length, dist = 3)
+    ## save as two column: seq, freq
+    x = table(b_v)
+    d = data.frame(seq = names(x), freq = as.integer(x))
+    readr::write_tsv(d, file)
 }
 
-simu_barcode_random = function(file = "./tmp/random_barcodes.tsv") {
-    if (!file.exists(file)) {
-        b_v = stringi::stri_rand_strings(n = 1e6, length = 14, pattern = '[ATCG]')
-        x = table(b_v)
-        d = data.frame(seq = names(x), freq = as.integer(x))
-        readr::write_tsv(d, file)
-    }
-    fread(file)
+simu_barcode_random = function(
+    length = 14,
+    n = 1e6,
+    output = "random_barcodes.tsv"
+    ) {
+    b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
+    x = table(b_v)
+    d = data.frame(seq = names(x), freq = as.integer(x))
+    readr::write_tsv(d, file)
 }
-
-simu_barcode_vdj = function(file = "./tmp/vdj_barcodes.tsv") {
-    if (!file.exists(file)) {
-        stop("no vdj barcode library exist!")
-    }
-    fread(file)
-}
-
-simu_barcode_custom = function(file) {
-    ## the file should contain two columns: seq and freq
-    fread(file)
-}
-
 
 #' parameters:
 #'  barcode number
 #'  barcode type: hamming, random, vdj, custom
 simu_barcode = function(
-    n = 300,
-    barcode_type = "hamming",
     file = NULL
     ) {
-    if (barcode_type == "hamming") {
-        if (is.null(file)) {
-            d_barcode_lib = simu_barcode_hamming()
-        } else {
-            d_barcode_lib = simu_barcode_hamming(file)
-        }
-    } else if (barcode_type == "random") {
-        if (is.null(file)) {
-            d_barcode_lib = simu_barcode_random()
-        } else {
-            d_barcode_lib = simu_barcode_random(file)
-        }
-    } else if (barcode_type == "vdj") {
-        if (is.null(file)) {
-            d_barcode_lib = simu_barcode_vdj()
-        } else {
-            d_barcode_lib = simu_barcode_vdj(file)
-        }
-    } else if (barcode_type == "custom") {
-        d_barcode_lib = simu_barcode_custom(file)
+    if (is.null(file)) {
+        stop("no barcode library file!")
     }
+
+    d_barcode_lib = simu_barcode_custom(file)
 
     res = sample(
         d_barcode_lib$seq, 
@@ -164,7 +135,6 @@ simu_sequence_run_command = function(input, profile, reads_length = 110, output,
 #' Run the simulation
 #'  parameters:
 #'      barcode related:
-#'          barcode_type: hamming, random, vdj, custom
 #'          barcode_library_file: default NULL
 #'      clone size related:
 #'          clone_size_dist: uniform, lognormal
@@ -182,7 +152,6 @@ simu_sequence_run_command = function(input, profile, reads_length = 110, output,
 #'          reads_length: default 110
 ## TODO: use a file to control the barcode type, instead using the barcode type parameters
 simulate_main = function(
-    barcode_type         = "hamming",
     barcode_library_file = NULL,
     clone_size_dist      = "uniform",
     clone_n              = 300,
@@ -206,7 +175,6 @@ simulate_main = function(
     ## simulate barcode
     d_barcode_label = simu_barcode(
         clone_n,
-        barcode_type = barcode_type,
         file = barcode_library_file
     )
     ## set the barcode length for random barcode
@@ -291,14 +259,13 @@ simulate_main = function(
     )
 }
 
-############################
-#  UMI_barcode simulation  #
-############################
+#######################################
+#  UMI_barcode sequencing simulation  #
+#######################################
 
 #' Run the simulation
 #'  parameters:
 #'      barcode related:
-#'          barcode_type: hamming, random, vdj, custom
 #'          barcode_library_file: default NULL
 #'      clone size related:
 #'          clone_size_dist: uniform, lognormal
@@ -317,7 +284,6 @@ simulate_main = function(
 ## TODO: use a file to control the barcode type, instead using the barcode type parameters
 
 simulate_main_umi = function(
-    barcode_type         = "hamming",
     barcode_library_file = NULL,
     clone_size_dist      = "uniform",
     clone_n              = 300,
@@ -342,7 +308,6 @@ simulate_main_umi = function(
     ## simulate barcode
     d_barcode_label = simu_barcode(
         clone_n,
-        barcode_type = barcode_type,
         file = barcode_library_file
     )
     ## set the barcode length for random barcode

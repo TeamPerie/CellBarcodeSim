@@ -8,8 +8,7 @@ library(DNABarcodes)
 source("lib/lib_simulation.R")
 
 simulate_main(
-    barcode_type         = "random",
-    barcode_library_file = NULL,
+    barcode_library_file = "./example_barcode_library/random_barcodes.tsv",
     clone_size_dist      = "uniform",
     clone_n              = 20,
     clone_size_dist_par  = list(size_max      = 1000, size_min = 1),

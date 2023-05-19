@@ -1,6 +1,6 @@
 # DNA barcode sequencing simulation kit
 
-
+[toc]
 
 The scrips in this repo were used to simulate the DNA barcode sequencing results, which can be UMI and non-UMI sequencing.
 
@@ -23,10 +23,59 @@ The scrips depends on the following packages:
 -   readr
 -   stringr
 -   data.table
+-   DNABarcodes
+
+Script for installing the above packages:
+
+```R
+install.packages(c("plyr", "magrittr", "reader", "stringr", "data.table"))
+BiocManager::install("DNABarcodes")
+```
+
+
 
 ## Run
 
-## Non UMI simulation
+### The build in barcode library
+
+The barcode library file is needed for the sequencing simulation function described below. 
+
+The file shold be tab seperateted file (TSV) and consist of two columns, 
+
+1.   `seq`: barcode sequence.
+2.   `freq`: barcode frequency. It is used as barcode probability weight, while sampling the barcode library to label the cells.
+
+Three example barcode libraries are in the `example_barcode_library` fold. They are:
+
+1.   `random_barcodes.tsv`: 14bp random barocode library consists of 1e6 simulated sequences. Exists some duplicated sequences. 
+2.   `hamming_barcodes.tsv`: 9155 14bp sequences have been identified with a minimum Hamming distance of 3 between each sequence.
+3.   `vdj_barcodes.tsv`: $1^9$ simulated VDJ barcodes that contains around 3 million unique barcodes.
+
+The simulation methods were described in the original paper.
+
+### The barcode library simulation function
+
+#### Hamming distance barcode
+
+The funciton `simu_barcode_hamming()` wrap the barcode simulator in DNABarcodes package to simulate barcode library given hamming distance. It accepts two parameters:
+
+1.   `length`:  barcode length.
+2.   `dist`: hamming distance.
+3.   `output`: output file path.
+
+The output follow the format in last section, which is a tsv file with two columns. 
+
+More complex cases please use the DNABarcodes package directly, and the simulated barcode library can be used as the input of the simulation function.
+
+#### Random barcode
+
+The function `simu_barcode_random()` simulates the random barcodes. It accepts three parameters:
+
+1.   `length`: barcode length.
+2.   `n`: number of sequences to be simulated. Due to the potential duplications, the unique barcodes can be less than the total sequence number.
+3.   `output`: output file path.
+
+### Non UMI simulation
 
 We can run the `simulate_main()` function to do the simulation without UMI. The executable example is `example.R` file.
 
@@ -34,7 +83,6 @@ Following is the all parameters and default values:
 
 ```r
 simulate_main(
-    barcode_type         = "hamming",
     barcode_library_file = NULL,
     clone_size_dist      = "uniform",
     clone_n              = 300,
@@ -56,8 +104,7 @@ simulate_main(
 
 The parameters:
 
--   `barcode_type`: the building barcode simulator is `hamming`, `random` barcode, `vdj` barcode. This option can be `custom` to allow using a given barcode frequency table as barcode library (see more detail in `barcode_library_file par`).
--   `barcode_library_file`: the location of barcode frequency list. We sample the list to have the barcode used for labeling. If the file exists, the program will use it without redo the simulation. The default value is `NULL`, in this case, the new generated barcode library file will be named `./tmp/random_barcodes.tsv`, `./tmp/hamming_barcodes.tsv`. And when `barcode_type` is `custom` , this parameter is mandatory. When a costum file is given, it should have two columns with first column named `seq` and second column named `freq`.
+-   `barcode_library_file`: the location of barcode frequency list. We sample the list to have the barcode used for labeling. A barcode library file is necessary. Please refer to the sections above to know how to prepare it.
 -   `clone_size_dist`: clone size distribution, it can be `uniform` or `lognormal`. The `clone_size_dist_par` should match the this parameter's value (see more detail in below).
 -   `clone_n`: Number of progenitors, default 300.
 -   `clone_size_dist_par`: a list. When `clone_size_dist` is `uniform`, the list should contain two item `size_max` and `size_min`, when `clone_size_dist` is `lognormal`, the list should contain `size_mean` - log mean and `size_variant` - log sd.
@@ -74,7 +121,7 @@ The parameters:
 -   `sequence_trunk`: To make the barocde sequence short by choosing the first n base, default 10.
 -   `art_bin`: the executable ART simulator location. The default is "./lib/art_bin_MountRainier/art_illumina".
 
-## UMI sequencing simulation
+### UMI sequencing simulation
 
 Similarly we can simulate the UMI sequencing result with function `simulate_main_umi()`.
 
@@ -82,7 +129,6 @@ Following shows all the parameters and default values.
 
 ```R
 simulate_main_umi(
-    barcode_type         = "hamming",
     barcode_library_file = NULL,
     clone_size_dist      = "uniform",
     clone_n              = 300,
@@ -110,7 +156,7 @@ For the `simulate_main_umi()` specific parameters:
 -   `umi_length`: The UMI base pair length, defautl is 8.
 -   `umi_tagging_efficiency`: The UMI tagging efficiency, default is 0.25.
 
-## Output
+## Barcode sequencing output
 
 The output location and file name is defined by the `output_prefix` option. For example, by running the `example.R`, the option is `./tmp/simu_seq`. The output files are in `./tmp/` fold:
 
