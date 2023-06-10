@@ -46,7 +46,7 @@ Three example barcode libraries are in the `example_barcode_library` fold. They 
 
 1.   `random_barcodes.tsv`: 14bp random barocode library consists of 1e6 simulated sequences. Exists some duplicated sequences. 
 2.   `hamming_barcodes.tsv`: 9155 14bp sequences have been identified with a minimum Hamming distance of 3 between each sequence.
-3.   `vdj_barcodes.tsv`: $1^9$ simulated VDJ barcodes that contains around 3 million unique barcodes.
+3.   `vdj_barcodes.tsv`: $10^7$ simulated VDJ barcodes that contains around $1.4x10^5$ unique barcodes.
 
 The simulation methods were described in the original paper.
 
