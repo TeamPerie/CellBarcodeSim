@@ -1,7 +1,4 @@
 # DNA barcode sequencing simulation kit
-
-
-
 The scrips in this repo were used to simulate the DNA barcode sequencing results, which can be UMI and non-UMI sequencing.
 
 ## Configuration
