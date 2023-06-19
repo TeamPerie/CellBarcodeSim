@@ -1,82 +1,94 @@
 # DNA barcode sequencing simulation kit
-The scrips in this repo were used to simulate the DNA barcode sequencing results, which can be UMI and non-UMI sequencing.
+
+The scripts in this repo were used to simulate DNA barcode sequencing results, including both UMI (unique molecular identifier) sequencing and non-UMI sequencing techniques.
 
 ## Configuration
 
-### Install ART 
+### Install ART
 
-Download the ART NGS simulator from here:
+Please download the ART NGS simulator from here:
 
-https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm 
+<https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm>
 
-And put it to the `lib` fold. The default simulator executable file should be `./lib/art_bin_MountRainier/art_illumina`. Otherwise, the `art_bin` variable should be configured to point the `art_illumina` file.
+And put it into the `lib` fold of this repo.
+The default simulator executable file will be `./lib/art_bin_MountRainier/art_illumina`.
+
+Otherwise, please make the `art_bin` variable point to the `art_illumina` file.
 
 ### Install R dependencies
 
-The scrips depends on the following packages:
+The following R packages are required for running the simulation:
 
--   plyr
--   magrittr
--   readr
--   stringr
--   data.table
--   DNABarcodes
+- plyr
+- magrittr
+- readr
+- stringr
+- data.table
+- DNABarcodes
 
 Script for installing the above packages:
 
 ```R
+## Install BiocManager if not installed
+# install.packages("BiocManager")
+
+## Install CRAN packages
 install.packages(c("plyr", "magrittr", "reader", "stringr", "data.table"))
+
+## Install Bioconductor packages
 BiocManager::install("DNABarcodes")
 ```
 
+## Run the simulation
 
+### The built-in barcode library
 
-## Run
+The barcode library file is needed for the sequencing simulation function described below.
 
-### The build in barcode library
+The file should be a tab-separated file (TSV) and consist of two columns, 
 
-The barcode library file is needed for the sequencing simulation function described below. 
-
-The file shold be tab seperateted file (TSV) and consist of two columns, 
-
-1.   `seq`: barcode sequence.
-2.   `freq`: barcode frequency. It is used as barcode probability weight, while sampling the barcode library to label the cells.
+1. `seq` column: barcode sequence.
+2. `freq` column: barcode frequency. It is used as barcode probability while sampling the barcode library to label the cells.
 
 Three example barcode libraries are in the `example_barcode_library` fold. They are:
 
-1.   `random_barcodes.tsv`: 14bp random barocode library consists of 1e6 simulated sequences. Exists some duplicated sequences. 
-2.   `hamming_barcodes.tsv`: 9155 14bp sequences have been identified with a minimum Hamming distance of 3 between each sequence.
-3.   `vdj_barcodes.tsv`: $10^7$ simulated VDJ barcodes that contains around $1.4x10^5$ unique barcodes.
+1. Random barcode: `random_barcodes.`tsv` contains a 14bp random barcode library consisting of 1e6 simulated sequences. Exists some duplicated sequences.
+2. Hamming distance barcode: `hamming_barcodes.tsv` contains 9155 14bp sequences that have been identified with a minimum Hamming distance of 3 between each sequence.
+3. Vdj barcode: `vdj_barcodes.tsv` contains $10^7$ simulated VDJ barcodes that contain around $1.4\times10^5$ unique barcodes.
 
-The simulation methods were described in the original paper.
+The simulation methods were described in the paper (TBD: add paper link).
 
 ### The barcode library simulation function
 
+There are also two functions to simulate barcode libraries.
+
 #### Hamming distance barcode
 
-The funciton `simu_barcode_hamming()` wrap the barcode simulator in DNABarcodes package to simulate barcode library given hamming distance. It accepts two parameters:
+The function `simu_barcode_hamming()` wrap the barcode simulator in the [DNAbarcodes](https://bioconductor.org/packages/release/bioc/html/DNABarcodes.html) package to simulate the barcode library given hamming distance.
+It accepts three parameters:
 
-1.   `length`:  barcode length.
-2.   `dist`: hamming distance.
-3.   `output`: output file path.
+1. `length`:  barcode length.
+2. `dist`: hamming distance.
+3. `output`: output file path.
 
-The output follow the format in last section, which is a tsv file with two columns. 
+The output is a two columns TSV file which is described in the previous section.
 
-More complex cases please use the DNABarcodes package directly, and the simulated barcode library can be used as the input of the simulation function.
+For more complex cases please simulate directly with the [DNABarcodes](https://bioconductor.org/packages/release/bioc/html/DNABarcodes.html) package.
 
 #### Random barcode
 
 The function `simu_barcode_random()` simulates the random barcodes. It accepts three parameters:
 
-1.   `length`: barcode length.
-2.   `n`: number of sequences to be simulated. Due to the potential duplications, the unique barcodes can be less than the total sequence number.
-3.   `output`: output file path.
+1. `length`: barcode length.
+2. `n`: number of sequences to be simulated. The unique barcodes can be less than the total sequence number due to the potential duplications.
+3. `output`: output file path.
 
 ### Non UMI simulation
 
-We can run the `simulate_main()` function to do the simulation without UMI. The executable example is `example.R` file.
+We can run the `simulate_main()` function to do the simulation without UMI.
+You can find an example in `example.R` file.
 
-Following is the all parameters and default values:
+Following are the parameters and the default:
 
 ```r
 simulate_main(
@@ -101,28 +113,37 @@ simulate_main(
 
 The parameters:
 
--   `barcode_library_file`: the location of barcode frequency list. We sample the list to have the barcode used for labeling. A barcode library file is necessary. Please refer to the sections above to know how to prepare it.
--   `clone_size_dist`: clone size distribution, it can be `uniform` or `lognormal`. The `clone_size_dist_par` should match the this parameter's value (see more detail in below).
--   `clone_n`: Number of progenitors, default 300.
--   `clone_size_dist_par`: a list. When `clone_size_dist` is `uniform`, the list should contain two item `size_max` and `size_min`, when `clone_size_dist` is `lognormal`, the list should contain `size_mean` - log mean and `size_variant` - log sd.
--   `cycle`: PCR cycle number. Because the nature of the exponential sequence of PCR process, the run time and output file size increase will increase exponentially with the `cycle` value.
--   `efficiency`: PCR efficiency with default value 0.705.
--   `error`: PCR error per base with default 1e-6.
--   `pcr_read_per_cell`: Reads number needed for sequence, how much per progeny cell.
--   `output_prefix`: Output prefix.
--   `ngs_profile`: NGS profile, this option will be transmit to ART sequencing simulator. The building profile is, "MSv1", "HS20" etc. For more detail, please check the ART simulator.
--   `reads_length`: The NGS sequencing reads length. It should be shorter than the PCR results. Otherwise there will be an error. In that case, you can add `top_seq` or `bottom_seq` to increase the PCR results.
--   `is_replicate`: Generate technical replicates or not. The technical replicates will generate by dividing the progeny cells into two sample and do the PCR for each of them. The two sequencing output will be labeled by pendix `_2` of the output file.
--   `top_seq`: Add 5 end constant sequences to the barcodes for sequencing simulation.
--   `bottom_seq`: Add 3 end constant sequences to the barcodes sequencing simulation.
--   `sequence_trunk`: To make the barocde sequence short by choosing the first n base, default 10.
--   `art_bin`: the executable ART simulator location. The default is "./lib/art_bin_MountRainier/art_illumina".
+- `barcode_library_file`: The location of the barcode frequency list.
+This parameter is necessary and has no default value. We sample the list to have the barcode for labeling.
+Please refer to the sections above to know how to prepare it.
+- `clone_size_dist`: clone size distribution, it can be `uniform` or `lognormal`.
+The `clone_size_dist_par` should match the chosen model (see more detail below).
+- `clone_n`: Number of labeled cells (progenitors) at initiation, default 300.
+- `clone_size_dist_par`: a list.
+If `uniform` clone size distribution is chosen, the list should contain two items `size_max` and `size_min` for the range of the uniform distribution. 
+If `lognormal` is chosen, the list should contain `size_mean` which is log mean, and `size_variant` which is log sd.
+- `cycle`: PCR cycle number.
+The run time and output file size increase will increase exponentially with the `cycle` value, because of the exponential nature of PCR amplification.
+- `efficiency`: PCR efficiency with a default value of 0.705 for each cycle.
+- `error`: PCR error per base with a default value of $10^{-6}$.
+- `pcr_read_per_cell`: Expacted sequencing reads per each progeny cell.
+- `output_prefix`: Output prefix.
+- `ngs_profile`: NGS profile, this option will be transmitted to ART sequencing simulator.
+The building profile is, "MSv1", "HS20" etc.
+For more detail, please check the ART simulator.
+- `reads_length`: The NGS sequencing reads length.
+**It should be shorter than the PCR results.**
+You can use `top_seq` or `bottom_seq` (described below) to add the constant sequences to increase the PCR sequence length.
+- `is_replicate`: Generate technical replicates or not. The technical replicates will generate by dividing the progeny cells into two samples and do the PCR for each. The sequencing data will be labeled by pending `_2` to label the replicate.
+- `top_seq`: Add constant sequences to the left (5') of the PCR result.
+- `bottom_seq`: Add constant sequences to the right (3') of the PCR result.
+- `sequence_trunk`: Substring the barcode sequence by choosing the first n base, default 10.
+If the value is bigger than the barcode length, the barcode sequence will not be truncated.
+- `art_bin`: The executable ART simulator location. The default is `./lib/art_bin_MountRainier/art_illumina`.
 
 ### UMI sequencing simulation
 
-Similarly we can simulate the UMI sequencing result with function `simulate_main_umi()`.
-
-Following shows all the parameters and default values.
+We can simulate the UMI sequencing result with the function `simulate_main_umi(`)`.
 
 ```R
 simulate_main_umi(
@@ -147,18 +168,20 @@ simulate_main_umi(
 )
 ```
 
-For the `simulate_main_umi()` specific parameters:
+For most of the parameters, you can find explanations in the documents of `simu_main`.
+The `simulate_main_umi()` specific parameters:
 
--   `preamp_n`: PCR cycle before conjuncting UMI, default is 0.
--   `umi_length`: The UMI base pair length, defautl is 8.
--   `umi_tagging_efficiency`: The UMI tagging efficiency, default is 0.25.
+- `preamp_n`: PCR cycle before catenating UMI, default is 0.
+- `umi_length`: The UMI base pair length, default is 8.
+- `umi_tagging_efficiency`: The UMI tagging efficiency, default is 0.25.
+It means 25% of sequences in the pre-PCR pool will be tagged by UMI.
 
-## Barcode sequencing output
+## About the output
 
-The output location and file name is defined by the `output_prefix` option. For example, by running the `example.R`, the option is `./tmp/simu_seq`. The output files are in `./tmp/` fold:
+The output location and file name are defined by the `output_prefix` option.
+For example, by running the `example.R`, the option is `./tmp/simu_seq`. The output files are in `./tmp/` fold:
 
--   `simu_seq.fq` : The fastq of barcode sequencing.
--   `simu_seq.aln`: The middle file of ART.
--   `simu_seq_ref.tsv`: The induced barcodes.
--   `simu_seq_library.fasta`: The sequencing library loaded to the sequencing machine, which will carry the PCR error.
-
+- `simu_seq_ref.tsv`: The induced barcodes.
+- `simu_seq_library.fasta`: The sequencing library, which will only carry the PCR error.
+- `simu_seq.aln`: The intermediate files from ART.
+- `simu_seq.fq` : Fianl barcode sequencing fastq file.
