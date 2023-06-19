@@ -1,9 +1,7 @@
-#############
-#  Library  #
-#############
-# library(DNABarcodes)
-# library(readr)
-# library(stringi)
+## Creator: Wenjie SUN
+## Email: sunwjie at gmail.com
+## Date: 2023-06-19
+## Purpose: simulation functions for single cell barcode sequencing data
 
 ######################
 #  Clone simulation  #
@@ -14,12 +12,6 @@
 #'      clone size variation
 #'      clone number
 #'      average clone size
-#' uniform:
-#'  parameters:
-#'      max clone size
-#'      min clone size
-#'      clone number
-
 simu_clone_size_lognormal = function(
     n,                                 # clone number
     size_mean = 1.2,                   # meanlog
@@ -30,6 +22,11 @@ simu_clone_size_lognormal = function(
     size_v
 }
 
+#' uniform:
+#'  parameters:
+#'      max clone size
+#'      min clone size
+#'      clone number
 simu_clone_size_uniform = function(
     n,                                 # clone number
     size_max = 1000,
@@ -42,6 +39,7 @@ simu_clone_size_uniform = function(
 #  Barcode simulation  #
 ########################
 
+#' Simulate hamming distance barcode library
 simu_barcode_hamming = function(
     length = 10,
     dist = 3,
@@ -54,6 +52,7 @@ simu_barcode_hamming = function(
     readr::write_tsv(d, file)
 }
 
+#' Simulate random barcode library
 simu_barcode_random = function(
     length = 14,
     n = 1e6,
@@ -65,9 +64,7 @@ simu_barcode_random = function(
     readr::write_tsv(d, file)
 }
 
-#' parameters:
-#'  barcode number
-#'  barcode type: hamming, random, vdj, custom
+#' Function loading barcode library file
 simu_barcode = function(
     file = NULL
     ) {
@@ -96,9 +93,9 @@ Rcpp::sourceCpp("./lib/lib_pcr_simulation.cpp")
 #'      A list with two items. `seq` is character vector keeps sequences;
 #'      `freq` is a integer vector keeps the frequency of each sequences.
 #'  cycle: PCR cycle
-#'  efficiency: pcr efficiency
-#'  error: pcr error per base per cycle
-#'  reads: reads number sampled from PCR results
+#'  efficiency: pcr efficiency.
+#'  error: pcr error per base per cycle.
+#'  reads: reads number sampled from PCR results for sequencing.
 do_pcr = function(temp, cycle = 30, efficiency = 0.705, error = 1e-6, reads = 5e5) {
     ## do the PCR amplification
     pcr_res = pcr_amplify(temp, cycle, efficiency, error)
@@ -133,24 +130,6 @@ simu_sequence_run_command = function(input, profile, reads_length = 110, output,
 ##################################
 
 #' Run the simulation
-#'  parameters:
-#'      barcode related:
-#'          barcode_library_file: default NULL
-#'      clone size related:
-#'          clone_size_dist: uniform, lognormal
-#'          clone_n: number of clone
-#'          clone_size_dist_par: 
-#'              for lognormal: list(size_mean=1.2, size_variant=2)
-#'              for uniform: list(size_max=1000, size_min=1)
-#'      pcr related:
-#'          cycle: default 30 efficiency: 0.705
-#'          error: 1e-6
-#'          pcr_read_per_cell: 50
-#'      sequence related:
-#'          output_prefix: "./seq"
-#'          ngs_profile: MSv1, HS20
-#'          reads_length: default 110
-## TODO: use a file to control the barcode type, instead using the barcode type parameters
 simulate_main = function(
     barcode_library_file = NULL,
     clone_size_dist      = "uniform",
@@ -262,26 +241,6 @@ simulate_main = function(
 #######################################
 #  UMI_barcode sequencing simulation  #
 #######################################
-
-#' Run the simulation
-#'  parameters:
-#'      barcode related:
-#'          barcode_library_file: default NULL
-#'      clone size related:
-#'          clone_size_dist: uniform, lognormal
-#'          clone_n: number of clone
-#'          clone_size_dist_par: 
-#'              for lognormal: list(size_mean=1.2, size_variant=2)
-#'              for uniform: list(size_max=1000, size_min=1)
-#'      pcr related:
-#'          cycle: default 30 efficiency: 0.705
-#'          error: 1e-6
-#'          pcr_read_per_cell: 50
-#'      sequence related:
-#'          output_prefix: "./seq"
-#'          ngs_profile: MSv1, HS20
-#'          reads_length: default 110
-## TODO: use a file to control the barcode type, instead using the barcode type parameters
 
 simulate_main_umi = function(
     barcode_library_file = NULL,
@@ -403,15 +362,3 @@ simulate_main_umi = function(
         sequencing_result = output_prefix
     )
 }
-
-
-##############################
-#  Barcode process function  #
-##############################
-## 
-## Reference list
-## UMI
-## Threshold
-## Clustering
-
-
