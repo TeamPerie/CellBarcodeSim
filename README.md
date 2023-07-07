@@ -41,6 +41,10 @@ BiocManager::install("DNABarcodes")
 
 ## Run the simulation
 
+### Example
+
+There is a example script called `example.R` in the root. Normally, it takes less than 1 min to run it.
+
 ### The built-in barcode library
 
 The barcode library file is needed for the sequencing simulation function described below.
