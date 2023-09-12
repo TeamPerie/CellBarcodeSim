@@ -64,16 +64,42 @@ The simulation methods were described in the paper (TBD: add paper link).
 
 ### The barcode library simulation function
 
-There are also two functions to simulate barcode libraries.
+There are also 8 functions to simulate barcode libraries.
+
+They simulated 2 types of barcodes library X 4 barcode library distribution due to potential barcode amplification bias.
+
+The 2 types of barcodes library are:
+
+- Random barcode: The barcode sequences are random.
+- Hamming distance barcode: The barcode sequences have a minimum Hamming distance between each other.
+
+The 4 barcode library distribution are:
+
+- Uniform distribution.
+- Normal distribution.
+- Lognormal distribution.
+- Exponential distribution.
 
 #### Hamming distance barcode
 
-The function `simu_barcode_hamming()` wrap the barcode simulator in the [DNAbarcodes](https://bioconductor.org/packages/release/bioc/html/DNABarcodes.html) package to simulate the barcode library given hamming distance.
-It accepts three parameters:
+The four functions used to simulate the hamming distance barcode library are:
+
+- `simu_barcode_hamming_uniform()`: Simulate the hamming distance barcode library with uniform distribution.
+- `simu_barcode_hamming_norm()`: Simulate the hamming distance barcode library with normal distribution.
+- `simu_barcode_hamming_lnorm()`: Simulate the hamming distance barcode library with lognormal distribution.
+- `simu_barcode_hamming_exp()`: Simulate the hamming distance barcode library with exponential distribution.
+
+Those wrap the barcode simulator in the [DNAbarcodes](https://bioconductor.org/packages/release/bioc/html/DNABarcodes.html) package to simulate the barcode library given hamming distance.
+It accepts parameters:
 
 1. `length`:  barcode length.
 2. `dist`: hamming distance.
 3. `output`: output file path.
+4. `mean`: mean of the distribution, only for `simu_barcode_hamming_norm()`.
+5. `sd`: standard deviation of the distribution, only for `simu_barcode_hamming_norm()`.
+6. `log_mean`: log mean of the distribution, only for `simu_barcode_hamming_lnorm()`.
+7. `log_sd`: log standard deviation of the distribution, only for `simu_barcode_hamming_lnorm()`.
+8. `rate`: rate of the distribution, only for `simu_barcode_hamming_exp()`.
 
 The output is a two columns TSV file which is described in the previous section.
 
@@ -81,11 +107,23 @@ For more complex cases please simulate directly with the [DNABarcodes](https://b
 
 #### Random barcode
 
-The function `simu_barcode_random()` simulates the random barcodes. It accepts three parameters:
+The four functions used to simulate the random barcode library are:
+
+- `simu_barcode_random_uniform()`: Simulate the random barcode library with uniform distribution.
+- `simu_barcode_random_norm()`: Simulate the random barcode library with normal distribution.
+- `simu_barcode_random_lnorm()`: Simulate the random barcode library with lognormal distribution.
+- `simu_barcode_random_exp()`: Simulate the random barcode library with exponential distribution.
+
+They accepts parameters:
 
 1. `length`: barcode length.
 2. `n`: number of sequences to be simulated. The unique barcodes can be less than the total sequence number due to the potential duplications.
 3. `output`: output file path.
+4. `mean`: mean of the distribution, only for `simu_barcode_random_norm()`.
+5. `sd`: standard deviation of the distribution, only for `simu_barcode_random_norm()`.
+6. `log_mean`: log mean of the distribution, only for `simu_barcode_random_lnorm()`.
+7. `log_sd`: log standard deviation of the distribution, only for `simu_barcode_random_lnorm()`.
+8. `rate`: rate of the distribution, only for `simu_barcode_random_exp()`.
 
 ### Non UMI simulation
 
@@ -147,7 +185,7 @@ If the value is bigger than the barcode length, the barcode sequence will not be
 
 ### UMI sequencing simulation
 
-We can simulate the UMI sequencing result with the function `simulate_main_umi(`)`.
+We can simulate the UMI sequencing result with the function `simulate_main_umi()`.
 
 ```R
 simulate_main_umi(

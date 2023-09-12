@@ -39,8 +39,8 @@ simu_clone_size_uniform = function(
 #  Barcode simulation  #
 ########################
 
-#' Simulate hamming distance barcode library
-simu_barcode_hamming = function(
+#' Simulate hamming distance barcode library with uniform distribution
+simu_barcode_hamming_uniform = function(
     length = 10,
     dist = 3,
     output = "hamming_barcodes.tsv"
@@ -52,17 +52,111 @@ simu_barcode_hamming = function(
     readr::write_tsv(d, file)
 }
 
-#' Simulate random barcode library
-simu_barcode_random = function(
+#' Simulate hamming distance barcode library with normal distribution
+simu_barcode_hamming_norm = function(
+    length = 10,
+    dist = 3,
+    n = 1e6,
+    mean = 1,
+    sd = 1,
+    output = "hamming_barcodes_norm.tsv"
+    ) {
+    b_freq = rnorm(n, mean = mean, sd = sd) %>% ceiling()
+    b_v = DNABarcodes::create.dnabarcodes(n = length, dist = 3)
+    x = table(rep(b_v, b_freq))
+    d = data.frame(seq = names(x), freq = as.integer(x))
+    readr::write_tsv(d, file)
+}
+
+#' Simulate hamming distance barcode library with log normal distribution
+simu_barcode_hamming_lnorm = function(
+    length = 10,
+    dist = 3,
+    n = 1e6,
+    log_mean = 1,
+    log_sd = 1,
+    output = "hamming_barcodes_lnorm.tsv"
+    ) {
+    b_freq = rlnorm(n, meanlog = log_mean, sdlog = log_sd) %>% ceiling()
+    b_v = DNABarcodes::create.dnabarcodes(n = length, dist = 3)
+    x = table(rep(b_v, b_freq))
+    d = data.frame(seq = names(x), freq = as.integer(x))
+    readr::write_tsv(d, file)
+}
+
+#' Simulate hamming distance barcode library with exponential distribution
+simu_barcode_hamming_exp = function(
+    length = 10,
+    dist = 3,
+    n = 1e6,
+    rate = 1,
+    output = "hamming_barcodes_exp.tsv"
+    ) {
+    b_freq = rexp(n, rate) %>% ceiling()
+    b_v = DNABarcodes::create.dnabarcodes(n = length, dist = 3)
+    x = table(rep(b_v, b_freq))
+    d = data.frame(seq = names(x), freq = as.integer(x))
+    readr::write_tsv(d, file)
+}
+
+
+#' Simulate random barcode library with uniform distribution
+simu_barcode_random_uniform = function(
     length = 14,
     n = 1e6,
-    output = "random_barcodes.tsv"
+    output = "random_barcodes_uniform.tsv"
     ) {
     b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
     x = table(b_v)
     d = data.frame(seq = names(x), freq = as.integer(x))
     readr::write_tsv(d, file)
 }
+
+#' Simulate random barcode library with normal distribution
+simu_barcode_random_norm = function(
+    length = 14,
+    n = 1e6,
+    mean = 1,
+    sd = 1,
+    output = "random_barcodes_norm.tsv"
+    ) {
+    b_freq = rnorm(n, mean = mean, sd = sd) %>% ceiling()
+    b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
+    x = table(rep(b_v, b_freq))
+    d = data.frame(seq = names(x), freq = as.integer(x))
+    readr::write_tsv(d, file)
+}
+
+#' Simulate random barcode library with log normal distribution
+simu_barcode_random_lnorm = function(
+    length = 14,
+    n = 1e6,
+    log_mean = 1,
+    log_sd = 1,
+    output = "random_barcodes_lnorm.tsv"
+    ) {
+    b_freq = rlnorm(n, meanlog = log_mean, sdlog = log_sd) %>% ceiling()
+    b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
+    x = table(rep(b_v, b_freq))
+    d = data.frame(seq = names(x), freq = as.integer(x))
+    readr::write_tsv(d, file)
+}
+
+
+#' Simulate random barcode library with exponential distribution
+simu_barcode_random_exp = function(
+    length = 14,
+    n = 1e6,
+    rate = 1,
+    output = "random_barcodes_exp.tsv"
+    ) {
+    b_freq = rexp(n, rate) %>% ceiling()
+    b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
+    x = table(rep(b_v, b_freq))
+    d = data.frame(seq = names(x), freq = as.integer(x))
+    readr::write_tsv(d, file)
+}
+
 
 
 #' Function loading barcode library file
