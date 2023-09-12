@@ -64,15 +64,17 @@ simu_barcode_random = function(
     readr::write_tsv(d, file)
 }
 
+
 #' Function loading barcode library file
 simu_barcode = function(
+    n,
     file = NULL
     ) {
     if (is.null(file)) {
         stop("no barcode library file!")
     }
 
-    d_barcode_lib = simu_barcode_custom(file)
+    d_barcode_lib = fread(file)
 
     res = sample(
         d_barcode_lib$seq, 

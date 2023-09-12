@@ -132,7 +132,6 @@ void mutate(unordered_map<string, long> *tube_pcr, double ratio_mutation) {
     }
 }
 
-// [[Rcpp::export]]
 // The function to perform PCR amplification and mutation
 // Inputs:
 //   temp (List): A list that contains barcode sequences and their counts.
@@ -145,6 +144,7 @@ void mutate(unordered_map<string, long> *tube_pcr, double ratio_mutation) {
 //   The function first converts the input list object into an unordered map object.
 //   Then, the function calls the amplify and mutate functions to perform PCR amplification and mutation.
 //   The function then converts the unordered map object back to a list object and returns it.
+// [[Rcpp::export]]
 List pcr_amplify(List temp, int cycle, double efficiency_amplification, double ratio_mutation) {
 
     CharacterVector seq_temp = temp["seq"];
