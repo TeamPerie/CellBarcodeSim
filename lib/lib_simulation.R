@@ -88,7 +88,9 @@ simu_barcode = function(
 ####################
 #  PCR simulation  #
 ####################
-Rcpp::sourceCpp("./lib/lib_pcr_simulation.cpp")
+# Get the directory of the currently executing script
+current_dir <- dirname(parent.frame(2)$ofile)
+Rcpp::sourceCpp(paste0(current_dir, "/lib_pcr_simulation.cpp"))
 
 #' Input
 #'  temp: 
