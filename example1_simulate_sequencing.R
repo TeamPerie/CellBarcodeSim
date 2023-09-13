@@ -3,7 +3,6 @@ library(plyr)
 library(magrittr)
 library(readr)
 library(stringr)
-# library(DNABarcodes)
 
 source("lib/lib_simulation.R")
 

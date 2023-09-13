@@ -49,7 +49,7 @@ simu_barcode_hamming_uniform = function(
     ## save as two column: seq, freq
     x = table(b_v)
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, file)
+    readr::write_tsv(d, output)
 }
 
 #' Simulate hamming distance barcode library with normal distribution
@@ -65,7 +65,7 @@ simu_barcode_hamming_norm = function(
     b_v = DNABarcodes::create.dnabarcodes(n = length, dist = 3)
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, file)
+    readr::write_tsv(d, output)
 }
 
 #' Simulate hamming distance barcode library with log normal distribution
@@ -81,7 +81,7 @@ simu_barcode_hamming_lnorm = function(
     b_v = DNABarcodes::create.dnabarcodes(n = length, dist = 3)
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, file)
+    readr::write_tsv(d, output)
 }
 
 #' Simulate hamming distance barcode library with exponential distribution
@@ -96,7 +96,7 @@ simu_barcode_hamming_exp = function(
     b_v = DNABarcodes::create.dnabarcodes(n = length, dist = 3)
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, file)
+    readr::write_tsv(d, output)
 }
 
 
@@ -109,7 +109,7 @@ simu_barcode_random_uniform = function(
     b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
     x = table(b_v)
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, file)
+    readr::write_tsv(d, output)
 }
 
 #' Simulate random barcode library with normal distribution
@@ -124,7 +124,7 @@ simu_barcode_random_norm = function(
     b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, file)
+    readr::write_tsv(d, output)
 }
 
 #' Simulate random barcode library with log normal distribution
@@ -139,7 +139,7 @@ simu_barcode_random_lnorm = function(
     b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, file)
+    readr::write_tsv(d, output)
 }
 
 
@@ -154,7 +154,7 @@ simu_barcode_random_exp = function(
     b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, file)
+    readr::write_tsv(d, output)
 }
 
 
