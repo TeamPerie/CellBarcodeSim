@@ -1,0 +1,102 @@
+---
+title: "Using simulation determin barcode threshold"
+author: "Wenjie Sun"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+    theme: united 
+    fig_caption: true
+    highlight: textmate
+    keep_md: true
+always_allow_html: yes
+---
+
+```{r echo=F}
+library(knitr)
+opts_chunk$set(echo=T, TOC=T)
+```
+
+# About
+
+Here we show how to use the simulation tool to help determine the threshold to filtering barcode.
+
+Because the simulation tool needs several parameters, for rigorious purpose, we suggest to have a conservative estimation.
+
+# Simulate data
+
+## Load Package
+
+```{r}
+library(CellBarcodeSim)
+library(CellBarcode)
+```
+
+## Simulate barcode sequencing data
+
+```{r}
+barcode_library = system.file("data", "random_barcodes.tsv", package = "CellBarcodeSim")
+
+## Simulate a barcode sequencing experiment
+simulate_main(
+    barcode_library_file = barcode_library,  ## Define the barcode library
+    clone_n              = 20,  ## Define the number of clones
+    clone_size_dist      = "uniform", ## Define the clone size distribution
+    clone_size_dist_par  = list(size_max = 1000, size_min = 1),  ## Define the parameters of the clone size distribution
+    cycle                = 30,  ## Define the number of cell cycles
+    efficiency           = 0.705, ## Define the efficiency of the cell cycle
+    error                = 1e-6,  ## Define the error rate of the PCR, mutation per base per cycle
+    pcr_read_per_cell    = 50,  ## Define the number of PCR reads per cell (clone_n)
+    output_prefix        = "./tmp/simu_seq",  ## Define the output prefix
+    ngs_profile          = "MSv1",  ## Define the NGS profile (refer to ART sequencing simulator manual)
+    reads_length         = 35,  ## Define the length of the reads
+    is_replicate         = F,  ## Define whether to divide the reads into two replicates
+    top_seq              = "AAAAAAAAAAGGGGG",  ## Define the fixed sequence at the 5' end of the reads to be added
+    bottom_seq           = "TTTTTTTTTT",  ## Define the fixed sequence at the 3' end of the reads to be added
+    sequence_trunk       = 10, ## Define the length of the fixed sequence to be added
+    art_bin              = NULL ## Define the path to the ART sequencing simulator
+)
+```
+
+Load the true barcode sequence
+
+```{r}
+## Load the true barcode sequence
+barcode_true = fread("./tmp/simu_seq_ref.tsv")
+head(barcode_true)
+```
+
+Load the simulated barcode sequencing data
+
+```{r}
+fq = "./tmp/simu_seq.fq"
+```
+
+# Test threshold
+
+Here we tried to read in the simulated barcode sequencing result and try to show how the threshold works.
+
+We draw sequence frequency count distribution and labled the true barcode by red fragment underneith.
+The automatic threshold is calculated by `bc_auto_cutoff` function, and shown by the red vertical line.
+
+The result shows that the automatic threshold can keep most of the true barcode, and filter out the false barcode.
+
+```{r}
+## Extract barcode 
+bc = bc_extract(fq, pattern = "AAAAAAAAAAGGGGG(.{10})TTTTTTTTTT")
+
+## Apply the bc_cure_depth with actully no filtering, 
+## in order to make possible to plot the frequency distribution
+bc = bc_cure_depth(bc, depth = 0)
+
+## Try using automatic threshold
+auto_threshold = bc_auto_cutoff(bc)
+
+## Plot the sequence frequency distribution filtering
+bc_plot_single(bc, count_marks = auto_threshold, highlight = barcode_true$seq)
+```
+
+

@@ -1,0 +1,23 @@
+Package: CellBarcodeSim
+Title: Simulate CellBarcode sequencing
+Version: 0.0.0.9000
+Authors@R: 
+    person("Wenjie", "Sun", , "sunwjie@gmail.com", role = c("aut", "cre"))
+Description: This package aim to simulate DNA barcode sequencing results,
+    including both UMI (unique molecular identifier) sequencing and non-UMI
+    sequencing techniques.
+License: MIT
+Imports:
+    plyr,
+    magrittr,
+    readr,
+    stringr,
+    data.table,
+    DNABarcodes
+LinkingTo:
+    Rcpp
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Suggests: testthat (>= 3.0.0), knitr, rmarkdown, R.utils
+VignetteBuilder: knitr
+Encoding: UTF-8
