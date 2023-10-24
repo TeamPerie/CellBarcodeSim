@@ -4,46 +4,40 @@ The scripts in this repo were used to simulate DNA barcode sequencing results, i
 
 ## Configuration
 
-### Install ART
+### Install ART (optional)
 
-Please download the ART NGS simulator from here:
+The ART sequencing simulator is included in this repo, but you can also install it by yourself.
+The building ART simulator can work on 64-bit Linux, MacOS and Windows.
+
+In case to download the ART NGS simulator, please check out following link:
 
 <https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm>
 
-And put it into the `lib` fold of this repo.
-The default simulator executable file will be `./lib/art_bin_MountRainier/art_illumina`.
-
-Otherwise, please make the `art_bin` variable point to the `art_illumina` file.
+To use the customed ART simulator, please make the `art_bin` variable point to the `art_illumina` file.
+Otherwise, please keep the `art_bin` variable as default, which is `NULL`, to use the built-in ART simulator.
 
 ### Install R dependencies
 
 The following R packages are required for running the simulation:
 
-- plyr
-- magrittr
-- readr
-- stringr
-- data.table
-- DNABarcodes
-
-Script for installing the above packages:
+Script for installing the simulator:
 
 ```R
-## Install BiocManager if not installed
-# install.packages("BiocManager")
+## install remotes package if you do not have it
+install.packages("remotes")
 
-## Install CRAN packages
-install.packages(c("plyr", "magrittr", "reader", "stringr", "data.table"))
-
-## Install Bioconductor packages
-BiocManager::install("DNABarcodes")
+## install CellBarcodeSim from github
+remotes::install_github("TeamPerie/scMitoMut")
 ```
 
 ## Run the simulation
 
 ### Example
 
-There is a example script called `example.R` in the root. Normally, it takes less than 1 min to run it.
+The `example1_simulate_sequencing.R` script in the viggnettes fold will give you a demo of barcode sequencing simulation, you can find in the root dir.
+Normally, it takes less than 1 min to run it.
+
+Though we provided some barcode library in `viggnettes/` folder, if you need to generate more barcode libraries with customed parameters you can explore the example in `example2_simulate_barcode_library.R`.
 
 ### The built-in barcode library
 
@@ -54,11 +48,17 @@ The file should be a tab-separated file (TSV) and consist of two columns,
 1. `seq` column: barcode sequence.
 2. `freq` column: barcode frequency. It is used as barcode probability while sampling the barcode library to label the cells.
 
-Three example barcode libraries are in the `example_barcode_library` fold. They are:
+Three example barcode libraries are in the `inst/data` fold. They are:
 
 1. Random barcode: `random_barcodes.`tsv` contains a 14bp random barcode library consisting of 1e6 simulated sequences. Exists some duplicated sequences.
 2. Hamming distance barcode: `hamming_barcodes.tsv` contains 9155 14bp sequences that have been identified with a minimum Hamming distance of 3 between each sequence.
 3. Vdj barcode: `vdj_barcodes.tsv` contains $10^7$ simulated VDJ barcodes that contain around $1.4\times10^5$ unique barcodes.
+
+Once the barcode library is loaded, you can get the barcode library by using:
+
+```r
+barcode_library = system.file("data", "random_barcodes.tsv", package = "CellBarcodeSim")
+```
 
 The simulation methods were described in the paper (TBD: add paper link).
 
@@ -149,7 +149,7 @@ simulate_main(
     top_seq              = "",
     bottom_seq           = "",
     sequence_trunk       = 10,
-    art_bin              = "./lib/art_bin_MountRainier/art_illumina"
+    art_bin              = NULL
 )
 ```
 
@@ -164,6 +164,9 @@ The `clone_size_dist_par` should match the chosen model (see more detail below).
 - `clone_size_dist_par`: a list.
 If `uniform` clone size distribution is chosen, the list should contain two items `size_max` and `size_min` for the range of the uniform distribution. 
 If `lognormal` is chosen, the list should contain `size_mean` which is log mean, and `size_variant` which is log sd.
+If `powerlaw` clone size distribution is chosen, the list should contain three items `constant`, `scale` and `alpha`. They are corresponding to the parameters in following equation:
+$$f(scale \cdot x) = constant (scale \cdot x)^{-\alpha}$$
+Where $x \in [0,1]$.
 - `cycle`: PCR cycle number.
 The run time and output file size increase will increase exponentially with the `cycle` value, because of the exponential nature of PCR amplification.
 - `efficiency`: PCR efficiency with a default value of 0.705 for each cycle.
@@ -181,7 +184,7 @@ You can use `top_seq` or `bottom_seq` (described below) to add the constant sequ
 - `bottom_seq`: Add constant sequences to the right (3') of the PCR result.
 - `sequence_trunk`: Substring the barcode sequence by choosing the first n base, default 10.
 If the value is bigger than the barcode length, the barcode sequence will not be truncated.
-- `art_bin`: The executable ART simulator location. The default is `./lib/art_bin_MountRainier/art_illumina`.
+- `art_bin`: The executable ART simulator location. The default is `NULL`, which makes use of the building ART simulator.
 
 ### UMI sequencing simulation
 
@@ -206,7 +209,7 @@ simulate_main_umi(
     preamp_n             = 0,
     umi_length           = 8,
     umi_tagging_efficiency = 0.25,
-    art_bin              = "./lib/art_bin_MountRainier/art_illumina"
+    art_bin              = NULL
 )
 ```
 
