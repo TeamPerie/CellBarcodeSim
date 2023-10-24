@@ -164,6 +164,9 @@ The `clone_size_dist_par` should match the chosen model (see more detail below).
 - `clone_size_dist_par`: a list.
 If `uniform` clone size distribution is chosen, the list should contain two items `size_max` and `size_min` for the range of the uniform distribution. 
 If `lognormal` is chosen, the list should contain `size_mean` which is log mean, and `size_variant` which is log sd.
+If `powerlaw` clone size distribution is chosen, the list should contain three items `constant`, `scale` and `alpha`. They are corresponding to the parameters in following equation:
+$$f(scale \cdot x) = constant (scale \cdot x)^{-\alpha}$$
+Where $x \in [0,1]$.
 - `cycle`: PCR cycle number.
 The run time and output file size increase will increase exponentially with the `cycle` value, because of the exponential nature of PCR amplification.
 - `efficiency`: PCR efficiency with a default value of 0.705 for each cycle.

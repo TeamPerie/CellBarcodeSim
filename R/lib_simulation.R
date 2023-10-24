@@ -22,6 +22,21 @@ simu_clone_size_lognormal = function(
     size_v
 }
 
+#' powerlaw:
+#'  parameters:
+#'      clone number
+#'      average clone size
+simu_clone_size_powerlaw = function(
+    n,
+    constant = 10,
+    scale = 1,
+    alpha = 2
+    ) {
+    size_v = constant * (scale * runif(n))^-alpha
+    size_v[size_v <= 1] = 1
+    size_v
+}
+
 #' uniform:
 #'  parameters:
 #'      max clone size
@@ -218,8 +233,9 @@ do_pcr = function(temp, cycle = 30, efficiency = 0.705, error = 1e-6, reads = 5e
 #'  profile: it can be MSv1, HS20 ...
 #'  reads_length: default is 110
 #'  output: the output of the simulated sequencing reads
-simu_sequence_run_command = function(input, profile, reads_length = 110, output, art_bin = NULL) {
+simu_sequence_run_command = function(input, profile, output, reads_length = 110, qc_shift = 0, art_bin = NULL) {
 
+    ## configure the art binary
     if (is.null(art_bin)) {
         os <- tolower(Sys.info()["sysname"])
 
@@ -240,7 +256,18 @@ simu_sequence_run_command = function(input, profile, reads_length = 110, output,
             stop("The ART bin directory is not exist!")
         }
     }
-    cmd = str_glue("{art_bin} -ss {profile} -i {input} -amp -o {output} -l {reads_length} -f 1")
+
+    buildin_profile = c("MSv1", "HS20")
+
+    ## configure the profile
+    if (file.exists(profile)) {
+        cmd = str_glue("{art_bin} -qs {qc_shift} -1 {profile} -i {input} -amp -o {output} -l {reads_length} -f 1")
+    } else if (profile %in% buildin_profile) {
+        cmd = str_glue("{art_bin} -ss {profile}  -qs {qc_shift} -i {input} -amp -o {output} -l {reads_length} -f 1")
+    } else {
+        stop(str_glue("The profile/file {profile} is not exist."))
+    }
+
     system(cmd)
 }
 
@@ -265,6 +292,7 @@ simulate_main = function(
     top_seq              = "",
     bottom_seq           = "",
     sequence_trunk       = 10,
+    qc_shift             = 0,
     art_bin              = NULL
     ) {
 
@@ -296,7 +324,8 @@ simulate_main = function(
     }
 
     ## barcoded labeled cells
-    d_cell = data.frame(seq = d_barcode_label, freq = clone_size_v)
+    d_cell = data.table(seq = d_barcode_label, freq = clone_size_v)
+    d_cell = d_cell[, .(freq = sum(freq)), by = seq]
     cell_barcode = str_glue("{output_prefix}_ref.tsv")
     readr::write_tsv(d_cell, cell_barcode)
 
@@ -322,6 +351,7 @@ simulate_main = function(
         profile = ngs_profile,
         reads_length = reads_length,
         output = output_prefix,
+        qc_shift = qc_shift,
         art_bin = art_bin
         )
 
@@ -344,6 +374,7 @@ simulate_main = function(
             profile = ngs_profile,
             reads_length = reads_length,
             output = output_prefix2,
+            qc_shift = qc_shift,
             art_bin = art_bin
         )
 
@@ -379,6 +410,7 @@ simulate_main_umi = function(
     preamp_n             = 0,
     umi_length           = 8,
     umi_tagging_efficiency = 0.25,
+    qc_shift             = 0,
     art_bin              = NULL
     ) {
 
@@ -409,7 +441,8 @@ simulate_main_umi = function(
     }
 
     ## barcoded labeled cells
-    d_cell = data.frame(seq = d_barcode_label, freq = clone_size_v)
+    d_cell = data.table(seq = d_barcode_label, freq = clone_size_v)
+    d_cell = d_cell[, .(freq = sum(freq)), by = seq]
     cell_barcode = str_glue("{output_prefix}_ref.tsv")
     readr::write_tsv(d_cell, cell_barcode)
 
@@ -423,7 +456,7 @@ simulate_main_umi = function(
         x = paste0(umi_seq, rep(d_cell$seq, d_cell$freq))
         x = sample(x, round(length(x) * umi_tagging_efficiency), replace = F)
         x = table(x)
-        d_cell = data.frame(seq = names(x), freq = as.integer(x))
+        d_cell = data.table(seq = names(x), freq = as.integer(x))
 
         pcr_read_n = pcr_read_per_umi * sum(d_cell$freq)
 
@@ -441,15 +474,15 @@ simulate_main_umi = function(
             efficiency = efficiency,
             error = error,
             reads = -1
-            )
-
+        )
         umi_seq = stringi::stri_rand_strings(n = sum(d_preamp$freq), length = umi_length, pattern = '[ATCG]')
 
         ## UMI tagging
         x = paste0(umi_seq, rep(d_preamp$seq, d_preamp$freq))
         x = sample(x, round(length(x) * umi_tagging_efficiency), replace = F)
         x = table(x)
-        d_cell = data.frame(seq = names(x), freq = as.integer(x))
+        d_cell = data.table(seq = names(x), freq = as.integer(x))
+        d_cell = d_cell[, .(freq = sum(freq)), by = seq]
 
         pcr_read_n = pcr_read_per_umi * sum(d_cell$freq)
 
@@ -472,6 +505,7 @@ simulate_main_umi = function(
         profile = ngs_profile,
         reads_length = reads_length,
         output = output_prefix,
+        qc_shift = qc_shift,
         art_bin = art_bin
         )
 
