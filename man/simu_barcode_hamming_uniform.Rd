@@ -7,8 +7,24 @@
 simu_barcode_hamming_uniform(
   length = 10,
   dist = 3,
+  top_fix = "",
+  bottom_fix = "",
   output = "hamming_barcodes.tsv"
 )
+}
+\arguments{
+\item{length}{barcode length with default 10}
+
+\item{dist}{hamming distance with default 3}
+
+\item{top_fix}{5 end fix region sequence of the barcode with default "".}
+
+\item{bottom_fix}{3 end fix region sequence of the barcode with default "".}
+
+\item{output}{output file name with default "hamming_barcodes.tsv"}
+}
+\value{
+a barcode library file or a data frame
 }
 \description{
 Simulate hamming distance barcode library with uniform distribution

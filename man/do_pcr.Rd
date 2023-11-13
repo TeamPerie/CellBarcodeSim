@@ -2,24 +2,24 @@
 % Please edit documentation in R/lib_simulation.R
 \name{do_pcr}
 \alias{do_pcr}
-\title{Input
-temp:
-A list with two items. \code{seq} is character vector keeps sequences;
-\code{freq} is a integer vector keeps the frequency of each sequences.
-cycle: PCR cycle
-efficiency: pcr efficiency.
-error: pcr error per base per cycle.
-reads: reads number sampled from PCR results for sequencing.}
+\title{PCR amplification}
 \usage{
 do_pcr(temp, cycle = 30, efficiency = 0.705, error = 1e-06, reads = 5e+05)
 }
+\arguments{
+\item{temp}{a list with two items: \code{seq} is character vector keeps sequences; \code{freq} is a integer vector keeps the frequency of each sequences.}
+
+\item{cycle}{PCR cycle}
+
+\item{efficiency}{pcr efficiency.}
+
+\item{error}{pcr error per base per cycle.}
+
+\item{reads}{reads number sampled from PCR results for sequencing.}
+}
+\value{
+a list with two items: \code{seq} is character vector keeps sequences; \code{freq} is a integer vector keeps the frequency of each sequences.
+}
 \description{
-Input
-temp:
-A list with two items. \code{seq} is character vector keeps sequences;
-\code{freq} is a integer vector keeps the frequency of each sequences.
-cycle: PCR cycle
-efficiency: pcr efficiency.
-error: pcr error per base per cycle.
-reads: reads number sampled from PCR results for sequencing.
+PCR amplification
 }

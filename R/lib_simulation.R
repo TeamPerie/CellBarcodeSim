@@ -1,17 +1,14 @@
-## Creator: Wenjie SUN
-## Email: sunwjie at gmail.com
-## Date: 2023-06-19
-## Purpose: simulation functions for single cell barcode sequencing data
-
 ######################
 #  Clone simulation  #
 ######################
 
-#' log normal: 
-#'  parameters: 
-#'      clone size variation
-#'      clone number
-#'      average clone size
+#' Simulate clone size with log normal distribution
+#' 
+#' @param n clone number
+#' @param size_mean meanlog of log normal distribution with default 1.2
+#' @param size_variant meansd of log normal distribution with default 2
+#' @return a vector of clone size
+#' @export
 simu_clone_size_lognormal = function(
     n,                                 # clone number
     size_mean = 1.2,                   # meanlog
@@ -22,10 +19,14 @@ simu_clone_size_lognormal = function(
     size_v
 }
 
-#' powerlaw:
-#'  parameters:
-#'      clone number
-#'      average clone size
+#' Simulate clone size with power law distribution
+#'
+#' @param n clone number
+#' @param constant constant of power law distribution with default 10
+#' @param scale scale of power law distribution with default 1
+#' @param alpha alpha of power law distribution with default 2
+#' @return a vector of clone size
+#' @export
 simu_clone_size_powerlaw = function(
     n,
     constant = 10,
@@ -37,11 +38,13 @@ simu_clone_size_powerlaw = function(
     size_v
 }
 
-#' uniform:
-#'  parameters:
-#'      max clone size
-#'      min clone size
-#'      clone number
+#' Simulate clone size with exponential distribution
+#'
+#' @param n clone number
+#' @param size_max max clone size with default 1000
+#' @param size_min min clone size with default 1
+#' @return a vector of clone size
+#' @export
 simu_clone_size_uniform = function(
     n,                                 # clone number
     size_max = 1000,
@@ -55,135 +58,266 @@ simu_clone_size_uniform = function(
 ########################
 
 #' Simulate hamming distance barcode library with uniform distribution
+#' 
+#' @param length barcode length with default 10
+#' @param dist hamming distance with default 3
+#' @param output output file name with default "hamming_barcodes.tsv"
+#' @param top_fix 5 end fix region sequence of the barcode with default "".
+#' @param bottom_fix 3 end fix region sequence of the barcode with default "".
+#' @return a barcode library file or a data frame
+#' @export
 simu_barcode_hamming_uniform = function(
     length = 10,
     dist = 3,
+    top_fix = "",
+    bottom_fix = "",
     output = "hamming_barcodes.tsv"
     ) {
     b_v = DNABarcodes::create.dnabarcodes(n = length, dist = 3)
     ## save as two column: seq, freq
     x = table(b_v)
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, output)
+    d$x = paste0(top_fix, d$seq, bottom_fix)
+    if (is.null(output)) {
+        return(d)
+    } else {
+        readr::write_tsv(d, output)
+    }
 }
 
 #' Simulate hamming distance barcode library with normal distribution
+#'
+#' @param length barcode length with default 10
+#' @param dist hamming distance with default 3
+#' @param n number of barcodes with default 1e6
+#' @param mean mean of normal distribution with default 1
+#' @param sd sd of normal distribution with default 1
+#' @param top_fix 5 end fix region sequence of the barcode with default "".
+#' @param bottom_fix 3 end fix region sequence of the barcode with default "".
+#' @param output output file name with default "hamming_barcodes_norm.tsv"
+#' @return a barcode library file or a data frame
+#' @export
 simu_barcode_hamming_norm = function(
     length = 10,
     dist = 3,
     n = 1e6,
     mean = 1,
     sd = 1,
+    top_fix = "",
+    bottom_fix = "",
     output = "hamming_barcodes_norm.tsv"
     ) {
     b_freq = rnorm(n, mean = mean, sd = sd) %>% ceiling()
     b_v = DNABarcodes::create.dnabarcodes(n = length, dist = 3)
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, output)
+    d$x = paste0(top_fix, d$seq, bottom_fix)
+    if (is.null(output)) {
+        return(d)
+    } else {
+        readr::write_tsv(d, output)
+    }
 }
 
 #' Simulate hamming distance barcode library with log normal distribution
+#'
+#' @param length barcode length with default 10
+#' @param dist hamming distance with default 3
+#' @param n number of barcodes with default 1e6
+#' @param log_mean meanlog of log normal distribution with default 1
+#' @param log_sd sdlog of log normal distribution with default 1
+#' @param top_fix 5 end fix region sequence of the barcode with default "".
+#' @param bottom_fix 3 end fix region sequence of the barcode with default "".
+#' @param output output file name with default "hamming_barcodes_lnorm.tsv"
+#' @return a barcode library file or a data frame
+#' @export
 simu_barcode_hamming_lnorm = function(
     length = 10,
     dist = 3,
     n = 1e6,
     log_mean = 1,
     log_sd = 1,
+    top_fix = "",
+    bottom_fix = "",
     output = "hamming_barcodes_lnorm.tsv"
     ) {
     b_freq = rlnorm(n, meanlog = log_mean, sdlog = log_sd) %>% ceiling()
     b_v = DNABarcodes::create.dnabarcodes(n = length, dist = 3)
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, output)
+    d$x = paste0(top_fix, d$seq, bottom_fix)
+    if (is.null(output)) {
+        return(d)
+    } else {
+        readr::write_tsv(d, output)
+    }
 }
 
 #' Simulate hamming distance barcode library with exponential distribution
+#' 
+#' @param length barcode length with default 10
+#' @param dist hamming distance with default 3
+#' @param n number of barcodes with default 1e6
+#' @param rate rate of exponential distribution with default 1
+#' @param top_fix 5 end fix region sequence of the barcode with default "".
+#' @param bottom_fix 3 end fix region sequence of the barcode with default "".
+#' @param output output file name with default "hamming_barcodes_exp.tsv"
+#' @return a barcode library file or a data frame
 simu_barcode_hamming_exp = function(
     length = 10,
     dist = 3,
     n = 1e6,
     rate = 1,
+    top_fix = "",
+    bottom_fix = "",
     output = "hamming_barcodes_exp.tsv"
     ) {
     b_freq = rexp(n, rate) %>% ceiling()
     b_v = DNABarcodes::create.dnabarcodes(n = length, dist = 3)
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, output)
+    d$x = paste0(top_fix, d$seq, bottom_fix)
+    if (is.null(output)) {
+        return(d)
+    } else {
+        readr::write_tsv(d, output)
+    }
 }
 
 
 #' Simulate random barcode library with uniform distribution
+#'
+#' @param length barcode length with default 14
+#' @param n number of barcodes with default 1e6
+#' @param top_fix 5 end fix region sequence of the barcode with default "".
+#' @param bottom_fix 3 end fix region sequence of the barcode with default "".
+#' @param output output file name with default "random_barcodes_uniform.tsv"
+#' @return a barcode library file or a data frame
+#' @export
 simu_barcode_random_uniform = function(
     length = 14,
     n = 1e6,
+    top_fix = "",
+    bottom_fix = "",
     output = "random_barcodes_uniform.tsv"
     ) {
     b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
     x = table(b_v)
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, output)
+    d$x = paste0(top_fix, d$seq, bottom_fix)
+    if (is.null(output)) {
+        return(d)
+    } else {
+        readr::write_tsv(d, output)
+    }
 }
 
 #' Simulate random barcode library with normal distribution
+#'
+#' @param length barcode length with default 14
+#' @param n number of barcodes with default 1e6
+#' @param mean mean of normal distribution with default 1
+#' @param sd sd of normal distribution with default 1
+#' @param top_fix 5 end fix region sequence of the barcode with default "".
+#' @param bottom_fix 3 end fix region sequence of the barcode with default "".
+#' @param output output file name with default "random_barcodes_norm.tsv"
+#' @return a barcode library file or a data frame
+#' @export
 simu_barcode_random_norm = function(
     length = 14,
     n = 1e6,
     mean = 1,
     sd = 1,
+    top_fix = "",
+    bottom_fix = "",
     output = "random_barcodes_norm.tsv"
     ) {
     b_freq = rnorm(n, mean = mean, sd = sd) %>% ceiling()
     b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, output)
+    d$x = paste0(top_fix, d$seq, bottom_fix)
+    if (is.null(output)) {
+        return(d)
+    } else {
+        readr::write_tsv(d, output)
+    }
 }
 
 #' Simulate random barcode library with log normal distribution
+#'
+#' @param length barcode length with default 14
+#' @param n number of barcodes with default 1e6
+#' @param log_mean meanlog of log normal distribution with default 1
+#' @param log_sd sdlog of log normal distribution with default 1
+#' @param top_fix 5 end fix region sequence of the barcode with default "".
+#' @param bottom_fix 3 end fix region sequence of the barcode with default "".
+#' @param output output file name with default "random_barcodes_lnorm.tsv"
+#' @return a barcode library file or a data frame
+#' @export
 simu_barcode_random_lnorm = function(
     length = 14,
     n = 1e6,
     log_mean = 1,
     log_sd = 1,
+    top_fix = "",
+    bottom_fix = "",
     output = "random_barcodes_lnorm.tsv"
     ) {
     b_freq = rlnorm(n, meanlog = log_mean, sdlog = log_sd) %>% ceiling()
     b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, output)
+    d$x = paste0(top_fix, d$seq, bottom_fix)
+    if (is.null(output)) {
+        return(d)
+    } else {
+        readr::write_tsv(d, output)
+    }
 }
 
 
 #' Simulate random barcode library with exponential distribution
+#'
+#' @param length barcode length with default 14
+#' @param n number of barcodes with default 1e6
+#' @param rate rate of exponential distribution with default 1
+#' @param top_fix 5 end fix region sequence of the barcode with default "".
+#' @param bottom_fix 3 end fix region sequence of the barcode with default "".
+#' @param output output file name with default "random_barcodes_exp.tsv"
+#' @return a barcode library file or a data frame
+#' @export
 simu_barcode_random_exp = function(
     length = 14,
     n = 1e6,
     rate = 1,
+    top_fix = "",
+    bottom_fix = "",
     output = "random_barcodes_exp.tsv"
     ) {
     b_freq = rexp(n, rate) %>% ceiling()
     b_v = stringi::stri_rand_strings(n = n, length = length, pattern = '[ATCG]')
     x = table(rep(b_v, b_freq))
     d = data.frame(seq = names(x), freq = as.integer(x))
-    readr::write_tsv(d, output)
+    d$x = paste0(top_fix, d$seq, bottom_fix)
+    if (is.null(output)) {
+        return(d)
+    } else {
+        readr::write_tsv(d, output)
+    }
 }
 
 
-
-#' Function loading barcode library file
-simu_barcode = function(
+#' Function sample barcode library
+#' 
+#' @param n number of barcodes to sample
+#' @param d_barcode_lib a data.frame with two columns: `seq` and `freq`.
+#' @return a data frame
+#' @export
+sample_barcode = function(
     n,
-    file = NULL
+    d_barcode_lib = NULL
     ) {
-    if (is.null(file)) {
-        stop("no barcode library file!")
-    }
-
-    d_barcode_lib = fread(file)
 
     res = sample(
         d_barcode_lib$seq, 
@@ -201,14 +335,15 @@ simu_barcode = function(
 # current_dir <- dirname(parent.frame(2)$ofile)
 # Rcpp::sourceCpp(paste0(current_dir, "/lib_pcr_simulation.cpp"))
 
-#' Input
-#'  temp: 
-#'      A list with two items. `seq` is character vector keeps sequences;
-#'      `freq` is a integer vector keeps the frequency of each sequences.
-#'  cycle: PCR cycle
-#'  efficiency: pcr efficiency.
-#'  error: pcr error per base per cycle.
-#'  reads: reads number sampled from PCR results for sequencing.
+#' PCR amplification
+#'
+#' @param temp a list with two items: `seq` is character vector keeps sequences; `freq` is a integer vector keeps the frequency of each sequences.
+#' @param cycle PCR cycle
+#' @param efficiency pcr efficiency.
+#' @param error pcr error per base per cycle.
+#' @param reads reads number sampled from PCR results for sequencing.
+#' @return a list with two items: `seq` is character vector keeps sequences; `freq` is a integer vector keeps the frequency of each sequences.
+#' @export
 do_pcr = function(temp, cycle = 30, efficiency = 0.705, error = 1e-6, reads = 5e5) {
     ## do the PCR amplification
     pcr_res = pcr_amplify(temp, cycle, efficiency, error)
@@ -224,15 +359,17 @@ do_pcr = function(temp, cycle = 30, efficiency = 0.705, error = 1e-6, reads = 5e
 #  Sequencing simulation  #
 ###########################
 
-#' Need to download the ART to the `lib/ngs_simu` fold.
+# Need to download the ART to the `lib/ngs_simu` fold.
+# MiSeq sequencing model
 
-#' MiSeq sequencing model
-
-#' parameters
-#'  input: fasta file
-#'  profile: it can be MSv1, HS20 ...
-#'  reads_length: default is 110
-#'  output: the output of the simulated sequencing reads
+#' Run the ART sequencing simulator
+#'
+#' @param input input fasta file
+#' @param profile sequencing profile
+#' @param output output prefix of the simulated sequencing result
+#' @param reads_length reads length of the simulated sequencing result with default 110
+#' @param qc_shift quality score shift, default is 0
+#' @param art_bin path to the ART bin directory, default is NULL, which will use the package buildin ART bin directory.
 simu_sequence_run_command = function(input, profile, output, reads_length = 110, qc_shift = 0, art_bin = NULL) {
 
     ## configure the art binary
@@ -275,9 +412,30 @@ simu_sequence_run_command = function(input, profile, output, reads_length = 110,
 #  Main function for simulation  #
 ##################################
 
-#' Run the simulation
+#' Run the non-UMI barcode simulation
+#'
+#' @param barcode_library_file barcode library file, if not provided, the barcode_library should be provided.
+#' @param barcode_library barcode library data frame with two columns: `seq` and `freq`.
+#' @param clone_size_dist clone size distribution, should be one of `uniform` and `lognormal`.
+#' @param clone_n number of clones.
+#' @param clone_size_dist_par parameters for clone size distribution, check the function \code{\link{simu_clone_size_uniform}}, \code{\link{simu_clone_size_lognormal}}, and \code{\link{simu_clone_size_powerlaw}}.
+#' @param cycle PCR cycle count. 
+#' @param efficiency pcr efficiency, default is 0.705.
+#' @param error pcr error per base per cycle with default 1e-6.
+#' @param pcr_read_per_cell reads number sampled from PCR results for sequencing with default 50.
+#' @param output_prefix output prefix of the simulated sequencing result with default "./tmp/simu_seq".
+#' @param ngs_profile sequencing profile with default "MSv1".
+#' @param reads_length reads length of the simulated sequencing result with default 100.
+#' @param top_seq 5 end fix region sequence added after PCR default "".
+#' @param bottom_seq 3 end fix region sequence added after PCR default "".
+#' @param sequence_trunk the length of the barcode sequence to be used for the simulation with default 10.
+#' @param qc_shift quality score shift, default is 0.
+#' @param art_bin path to the ART bin directory, default is NULL, which will use the package buildin ART bin directory.
+#' @return a list with two items: `library_fasta` is the fasta file of the simulated library; `sequencing_result` is the prefix of the simulated sequencing result.
+#' @export
 simulate_main = function(
     barcode_library_file = NULL,
+    barcode_library      = NULL,
     clone_size_dist      = "uniform",
     clone_n              = 300,
     clone_size_dist_par  = list(size_max = 1000, size_min = 1),
@@ -288,7 +446,6 @@ simulate_main = function(
     output_prefix        = "./tmp/simu_seq",
     ngs_profile          = "MSv1",
     reads_length         = 100,
-    is_replicate         = F,
     top_seq              = "",
     bottom_seq           = "",
     sequence_trunk       = 10,
@@ -298,11 +455,21 @@ simulate_main = function(
 
     dir.create("./tmp/", showWarnings=F)
 
-    ## simulate barcode
-    d_barcode_label = simu_barcode(
-        clone_n,
-        file = barcode_library_file
-    )
+    if (!is.null(barcode_library_file)) {
+        d_barcoce_library = fread(barcode_library_file)
+        d_barcode_label = sample_barcode(
+            clone_n,
+            d_barcode_lib = d_barcoce_library
+        )
+    } else if (!is.null(barcode_library)) {
+        d_barcode_label = sample_barcode(
+            clone_n,
+            d_barcode_lib = barcode_library
+        )
+    } else {
+        stop("No barcode library provided!")
+    }
+
     ## set the barcode length for random barcode
     d_barcode_label = substring(d_barcode_label, 1, sequence_trunk)
     
@@ -318,6 +485,13 @@ simulate_main = function(
             clone_n,
             size_mean = clone_size_dist_par$size_mean,
             size_variant = clone_size_dist_par$size_variant
+            )
+    } else if (clone_size_dist == "powerlaw") {
+        clone_size_v = simu_clone_size_powerlaw(
+            clone_n,
+            constant = clone_size_dist_par$constant,
+            scale = clone_size_dist_par$scale,
+            alpha = clone_size_dist_par$alpha
             )
     } else {
         stop(str_glue("The clone size distribution {clone_size_dist} is not exist."))
@@ -355,7 +529,7 @@ simulate_main = function(
         art_bin = art_bin
         )
 
-    if (is_replicate) {
+    if (FALSE) {
         output_prefix2 = paste0(output_prefix, "_2")
         library_fasta2 = str_glue("{output_prefix2}_library.fasta")
 
@@ -392,8 +566,33 @@ simulate_main = function(
 #  UMI_barcode sequencing simulation  #
 #######################################
 
+#' Run the simulation for UMI_barcode sequencing
+#'
+#' @param barcode_library_file barcode library file, if not provided, the barcode_library should be provided.
+#' @param barcode_library barcode library data frame with two columns: `seq` and `freq`.
+#' @param clone_size_dist clone size distribution, should be `uniform`, `lognormal` or `powerlaw`.
+#' @param clone_n number of clones.
+#' @param clone_size_dist_par parameters for clone size distribution, check the function \code{\link{simu_clone_size_uniform}}, \code{\link{simu_clone_size_lognormal}}, and \code{\link{simu_clone_size_powerlaw}}.
+#' @param cycle total PCR cycle count with default 40.
+#' @param efficiency pcr efficiency, default is 0.705.
+#' @param error pcr error per base per cycle with default 1e-6.
+#' @param pcr_read_per_umi reads number sampled from PCR results for sequencing with default 50.
+#' @param output_prefix output prefix of the simulated sequencing result with default "./tmp/simu_umi_seq".
+#' @param ngs_profile sequencing profile with default "MSv1".
+#' @param reads_length reads length of the simulated sequencing result with default 100.
+#' @param top_seq 5 end fix region sequence added after PCR default "".
+#' @param bottom_seq 3 end fix region sequence added after PCR default "".
+#' @param sequence_trunk the max length of the barcode sequence to be used for the simulation with default 10.
+#' @param preamp_n pre-amplification cycle number with default 0.
+#' @param umi_length UMI length with default 8.
+#' @param umi_tagging_efficiency UMI tagging efficiency with default 0.25.
+#' @param qc_shift quality score shift, default is 0.
+#' @param art_bin path to the ART bin directory, default is NULL, which will use the package buildin ART bin directory.
+#' @return a list with two items: `library_fasta` is the fasta file of the simulated library; `sequencing_result` is the prefix of the simulated sequencing result.
+#' @export
 simulate_main_umi = function(
     barcode_library_file = NULL,
+    barcode_library      = NULL,
     clone_size_dist      = "uniform",
     clone_n              = 300,
     clone_size_dist_par  = list(size_max = 1000, size_min = 1),
@@ -415,11 +614,22 @@ simulate_main_umi = function(
     ) {
 
     dir.create("./tmp/", showWarnings=F)
-    ## simulate barcode
-    d_barcode_label = simu_barcode(
-        clone_n,
-        file = barcode_library_file
-    )
+
+    if (!is.null(barcode_library_file)) {
+        d_barcoce_library = fread(barcode_library_file)
+        d_barcode_label = sample_barcode(
+            clone_n,
+            d_barcode_lib = d_barcoce_library
+        )
+    } else if (!is.null(barcode_library)) {
+        d_barcode_label = sample_barcode(
+            clone_n,
+            d_barcode_lib = barcode_library
+        )
+    } else {
+        stop("No barcode library provided!")
+    }
+
     ## set the barcode length for random barcode
     d_barcode_label = substring(d_barcode_label, 1, sequence_trunk)
     
@@ -435,6 +645,13 @@ simulate_main_umi = function(
             clone_n,
             size_mean = clone_size_dist_par$size_mean,
             size_variant = clone_size_dist_par$size_variant
+            )
+    } else if (clone_size_dist == "powerlaw") {
+        clone_size_v = simu_clone_size_powerlaw(
+            clone_n,
+            constant = clone_size_dist_par$constant,
+            scale = clone_size_dist_par$scale,
+            alpha = clone_size_dist_par$alpha
             )
     } else {
         stop(str_glue("The clone size distribution {clone_size_dist} is not exist."))

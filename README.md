@@ -94,14 +94,18 @@ It accepts parameters:
 
 1. `length`:  barcode length.
 2. `dist`: hamming distance.
-3. `output`: output file path.
+3. `output`: output file path. 
 4. `mean`: mean of the distribution, only for `simu_barcode_hamming_norm()`.
 5. `sd`: standard deviation of the distribution, only for `simu_barcode_hamming_norm()`.
 6. `log_mean`: log mean of the distribution, only for `simu_barcode_hamming_lnorm()`.
 7. `log_sd`: log standard deviation of the distribution, only for `simu_barcode_hamming_lnorm()`.
 8. `rate`: rate of the distribution, only for `simu_barcode_hamming_exp()`.
+9. `top_fix`: 5 end fix flanking sequence.
+10. `bottom_fix`: 3 end fix flanking sequence.
 
-The output is a two columns TSV file which is described in the previous section.
+The output file dir is given, the output file is a two columns TSV file which is described in the previous section.
+
+Otherwise, the function will return a `data.table` with `seq` and `freq` column.
 
 For more complex cases please simulate directly with the [DNABarcodes](https://bioconductor.org/packages/release/bioc/html/DNABarcodes.html) package.
 
@@ -114,7 +118,7 @@ The four functions used to simulate the random barcode library are:
 - `simu_barcode_random_lnorm()`: Simulate the random barcode library with lognormal distribution.
 - `simu_barcode_random_exp()`: Simulate the random barcode library with exponential distribution.
 
-They accepts parameters:
+They accept parameters:
 
 1. `length`: barcode length.
 2. `n`: number of sequences to be simulated. The unique barcodes can be less than the total sequence number due to the potential duplications.
@@ -135,6 +139,7 @@ Following are the parameters and the default:
 ```r
 simulate_main(
     barcode_library_file = NULL,
+    barcode_library      = NULL,
     clone_size_dist      = "uniform",
     clone_n              = 300,
     clone_size_dist_par  = list(size_max = 1000, size_min = 1),
@@ -145,7 +150,7 @@ simulate_main(
     output_prefix        = "./tmp/simu_seq",
     ngs_profile          = "MSv1",
     reads_length         = 10,
-    is_replicate         = F,
+    is_replicate         = F,s
     top_seq              = "",
     bottom_seq           = "",
     sequence_trunk       = 10,
@@ -158,6 +163,7 @@ The parameters:
 - `barcode_library_file`: The location of the barcode frequency list.
 This parameter is necessary and has no default value. We sample the list to have the barcode for labeling.
 Please refer to the sections above to know how to prepare it.
+- `barcode_library`: If the `barcode_library_file` is empty, a `data.frame` of barcode library is used here. The `data.frame` should contain two columns `seq` and `freq`.
 - `clone_size_dist`: clone size distribution, it can be `uniform` or `lognormal`.
 The `clone_size_dist_par` should match the chosen model (see more detail below).
 - `clone_n`: Number of labeled cells (progenitors) at initiation, default 300.
@@ -193,6 +199,7 @@ We can simulate the UMI sequencing result with the function `simulate_main_umi()
 ```R
 simulate_main_umi(
     barcode_library_file = NULL,
+    barcode_library      = NULL,
     clone_size_dist      = "uniform",
     clone_n              = 300,
     clone_size_dist_par  = list(size_max = 1000, size_min = 1),

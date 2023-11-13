@@ -2,18 +2,20 @@
 % Please edit documentation in R/lib_simulation.R
 \name{simu_clone_size_uniform}
 \alias{simu_clone_size_uniform}
-\title{uniform:
-parameters:
-max clone size
-min clone size
-clone number}
+\title{Simulate clone size with exponential distribution}
 \usage{
 simu_clone_size_uniform(n, size_max = 1000, size_min = 1)
 }
+\arguments{
+\item{n}{clone number}
+
+\item{size_max}{max clone size with default 1000}
+
+\item{size_min}{min clone size with default 1}
+}
+\value{
+a vector of clone size
+}
 \description{
-uniform:
-parameters:
-max clone size
-min clone size
-clone number
+Simulate clone size with exponential distribution
 }
