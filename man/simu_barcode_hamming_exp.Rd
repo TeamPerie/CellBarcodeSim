@@ -9,8 +9,28 @@ simu_barcode_hamming_exp(
   dist = 3,
   n = 1e+06,
   rate = 1,
+  top_fix = "",
+  bottom_fix = "",
   output = "hamming_barcodes_exp.tsv"
 )
+}
+\arguments{
+\item{length}{barcode length with default 10}
+
+\item{dist}{hamming distance with default 3}
+
+\item{n}{number of barcodes with default 1e6}
+
+\item{rate}{rate of exponential distribution with default 1}
+
+\item{top_fix}{5 end fix region sequence of the barcode with default "".}
+
+\item{bottom_fix}{3 end fix region sequence of the barcode with default "".}
+
+\item{output}{output file name with default "hamming_barcodes_exp.tsv"}
+}
+\value{
+a barcode library file or a data frame
 }
 \description{
 Simulate hamming distance barcode library with exponential distribution

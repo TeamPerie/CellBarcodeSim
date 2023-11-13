@@ -2,28 +2,30 @@
 % Please edit documentation in R/lib_simulation.R
 \name{simu_sequence_run_command}
 \alias{simu_sequence_run_command}
-\title{Need to download the ART to the \code{lib/ngs_simu} fold.
-MiSeq sequencing model
-parameters
-input: fasta file
-profile: it can be MSv1, HS20 ...
-reads_length: default is 110
-output: the output of the simulated sequencing reads}
+\title{Run the ART sequencing simulator}
 \usage{
 simu_sequence_run_command(
   input,
   profile,
-  reads_length = 110,
   output,
+  reads_length = 110,
+  qc_shift = 0,
   art_bin = NULL
 )
 }
+\arguments{
+\item{input}{input fasta file}
+
+\item{profile}{sequencing profile}
+
+\item{output}{output prefix of the simulated sequencing result}
+
+\item{reads_length}{reads length of the simulated sequencing result with default 110}
+
+\item{qc_shift}{quality score shift, default is 0}
+
+\item{art_bin}{path to the ART bin directory, default is NULL, which will use the package buildin ART bin directory.}
+}
 \description{
-Need to download the ART to the \code{lib/ngs_simu} fold.
-MiSeq sequencing model
-parameters
-input: fasta file
-profile: it can be MSv1, HS20 ...
-reads_length: default is 110
-output: the output of the simulated sequencing reads
+Run the ART sequencing simulator
 }

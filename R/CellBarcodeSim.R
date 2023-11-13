@@ -8,7 +8,7 @@
 #' @name CellBarcodeSim
 #' @docType package
 #' @importFrom magrittr %>% %<>% extract extract2
-#' @importFrom data.table data.table rbindlist .N :=
+#' @importFrom data.table data.table rbindlist .N := fread
 #' @importFrom plyr . count
 #' @importFrom stringr str_glue str_match str_split_fixed str_c
 #' @import readr

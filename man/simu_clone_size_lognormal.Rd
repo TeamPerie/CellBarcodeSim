@@ -2,18 +2,20 @@
 % Please edit documentation in R/lib_simulation.R
 \name{simu_clone_size_lognormal}
 \alias{simu_clone_size_lognormal}
-\title{log normal:
-parameters:
-clone size variation
-clone number
-average clone size}
+\title{Simulate clone size with log normal distribution}
 \usage{
 simu_clone_size_lognormal(n, size_mean = 1.2, size_variant = 2)
 }
+\arguments{
+\item{n}{clone number}
+
+\item{size_mean}{meanlog of log normal distribution with default 1.2}
+
+\item{size_variant}{meansd of log normal distribution with default 2}
+}
+\value{
+a vector of clone size
+}
 \description{
-log normal:
-parameters:
-clone size variation
-clone number
-average clone size
+Simulate clone size with log normal distribution
 }
