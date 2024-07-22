@@ -27,7 +27,7 @@ Script for installing the simulator:
 install.packages("remotes")
 
 ## install CellBarcodeSim from github
-remotes::install_github("TeamPerie/scMitoMut")
+remotes::install_github("TeamPerie/CellBarcodeSim")
 ```
 
 ## Run the simulation
